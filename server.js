@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const notesData = require('./db/db.json')
+var notesData = require('./db/db.json')
 const { v4: uuidv4 } = require('uuid');
 
 const PORT = 5001;
@@ -28,6 +28,18 @@ app.post('/api/notes', (req, res) => {
     });
     res.status(201).json('Note created successfully');
   }
+});
+
+app.delete('/api/notes/:id', (req, res) => {
+  console.log(req.params.id);
+  notesData = notesData.filter(x => x.id !== req.params.id);
+  fs.writeFile('./db/db.json', JSON.stringify(notesData), err => {
+    if (err)
+      console.log(err);
+    else
+      console.log("Note deleted successfully!");
+  });
+  res.status(200).json(req.params.id);
 });
 
 // GET Route for notes page
