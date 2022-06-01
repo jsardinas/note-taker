@@ -17,29 +17,48 @@ app.use(express.static('public'));
 app.get('/api/notes', (req, res) => res.json(notesData));
 
 app.post('/api/notes', (req, res) => {
-  if(req.body){
+  if (req.body && req.body.title && req.body.text){
     const {title, text} = req.body;
     notesData.push({"id":uuidv4(), "title":title, "text":text});
     fs.writeFile('./db/db.json', JSON.stringify(notesData), err => {
-      if (err)
+      if(err){
+        notesData.pop();
         console.log(err);
-      else
-        console.log("Note created successfully!");
+        res.status(500).json('Error creating note');
+      }
+      else{
+        const successMsg = 'Note created successfully';
+        console.log(successMsg)
+        res.status(201).json(successMsg);
+      }
     });
-    res.status(201).json('Note created successfully');
+  }
+  else{
+    res.status(400).json('Bad request');
   }
 });
 
 app.delete('/api/notes/:id', (req, res) => {
   console.log(req.params.id);
-  notesData = notesData.filter(x => x.id !== req.params.id);
+  var i = 0;
+  while(i < notesData.length && notesData[i].id != req.params.id)++i;
+  if (i == notesData.length)
+    res.status(400).json('The requested id does not exist');
+
+  const deletedNote = notesData[i];
+  notesData.splice(i,1);  
   fs.writeFile('./db/db.json', JSON.stringify(notesData), err => {
-    if (err)
+    if (err){
       console.log(err);
-    else
-      console.log("Note deleted successfully!");
+      notesData.push(deletedNote);
+      res.status(500).json('Error deleting note');
+    }
+    else{
+      const successMsg = `Note ${req.params.id} deleted successfully`;
+      console.log(successMsg);
+      res.status(200).json(successMsg);
+    }
   });
-  res.status(200).json(req.params.id);
 });
 
 // GET Route for notes page
