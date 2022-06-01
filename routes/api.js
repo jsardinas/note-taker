@@ -9,7 +9,7 @@ api.post('/notes', (req, res) => {
   if (req.body && req.body.title && req.body.text){
     const {title, text} = req.body;
     notesData.push({"id":uuidv4(), "title":title, "text":text});
-    fs.writeFile('../db/db.json', JSON.stringify(notesData), err => {
+    fs.writeFile('./db/db.json', JSON.stringify(notesData), err => {
       if(err){
         notesData.pop();
         console.log(err);
@@ -36,7 +36,7 @@ api.delete('/notes/:id', (req, res) => {
 
   const deletedNote = notesData[i];
   notesData.splice(i,1);  
-  fs.writeFile('../db/db.json', JSON.stringify(notesData), err => {
+  fs.writeFile('./db/db.json', JSON.stringify(notesData), err => {
     if (err){
       console.log(err);
       notesData.push(deletedNote);
