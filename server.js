@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const notesData = require('./db/db.json')
+const uuid = require('uuid');
 
 const PORT = 5001;
 
@@ -16,7 +17,6 @@ app.use(express.static('public'));
 app.get('/api/notes', (req, res) => res.json(notesData));
 
 app.post('/api/notes', (req, res) => {
-  let response = 'OK';
   if(req.body){
     const {title, text} = req.body;
     notesData.push({"title":title, "text":text});
@@ -24,14 +24,10 @@ app.post('/api/notes', (req, res) => {
       if (err)
         console.log(err);
       else
-        console.log("Note added successfully!");
-    })
+        console.log("Note created successfully!");
+    });
+    res.status(201).json('Note created successfully');
   }
-});
-
-app.delete('api/notes', (req, res) => {
-  //console.log('delete request');
-  //console.log(req);
 });
 
 // GET Route for notes page
